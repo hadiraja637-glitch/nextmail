@@ -1,4 +1,22 @@
 {
-  "$schema":"https://openapi.vercel.sh/vercel.json",
-  "crons":[{"path":"/api/cleanup","schedule":"*/15 * * * *"}]
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [
+    {
+      "src": "nextmail-backend/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "nextmail-backend/main.py"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
 }
