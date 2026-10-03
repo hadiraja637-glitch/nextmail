@@ -1,133 +1,125 @@
+import os, secrets, hmac, hashlib, re
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
-import secrets
-import uuid
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from supabase import create_client, Client
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR=Path(__file__).resolve().parent
+app=FastAPI(title="NextMail API",version="2.0")
+app.add_middleware(CORSMiddleware,allow_origins=["*"],allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
 
-app = FastAPI(title="NextMail API", version="1.0.0")
+SUPABASE_URL=os.getenv("SUPABASE_URL","")
+SUPABASE_SECRET_KEY=os.getenv("SUPABASE_SECRET_KEY","")
+SUPABASE_PUBLISHABLE_KEY=os.getenv("SUPABASE_PUBLISHABLE_KEY","")
+MAIL_DOMAIN=os.getenv("MAIL_DOMAIN","nextmail.io").lower()
+MAILGUN_SIGNING_KEY=os.getenv("MAILGUN_SIGNING_KEY","")
+CRON_SECRET=os.getenv("CRON_SECRET","")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+db:Optional[Client]=create_client(SUPABASE_URL,SUPABASE_SECRET_KEY) if SUPABASE_URL and SUPABASE_SECRET_KEY else None
 
-users_db = {}
-emails_db = {}
+def database():
+    if not db: raise HTTPException(503,"Supabase is not configured on the server yet.")
+    return db
 
+def now(): return datetime.now(timezone.utc)
 
-class UserSignup(BaseModel):
-    email: str
-    password: str
+def current_user(request:Request):
+    if not db: return None
+    h=request.headers.get("authorization","")
+    if not h.lower().startswith("bearer "): return None
+    try: return db.auth.get_user(h.split(" ",1)[1]).user
+    except Exception: return None
 
+def profile(uid):
+    r=database().table("profiles").select("*").eq("id",uid).maybe_single().execute()
+    return r.data
 
-class UserLogin(BaseModel):
-    email: str
-    password: str
+def ensure_profile(user):
+    p=profile(str(user.id))
+    if p: return p
+    return database().table("profiles").insert({"id":str(user.id),"email":user.email}).execute().data[0]
 
+class GenerateRequest(BaseModel):
+    visitor_id: Optional[str]=None
 
-class PaymentRequest(BaseModel):
-    email: str
-    plan: str = "pro"
-
+@app.get("/api/config")
+def config():
+    return {"supabase_url":SUPABASE_URL,"supabase_publishable_key":SUPABASE_PUBLISHABLE_KEY,"mail_domain":MAIL_DOMAIN}
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "service": "NextMail API"}
-
-
-@app.post("/api/signup")
-def signup(user: UserSignup):
-    if user.email in users_db:
-        raise HTTPException(status_code=400, detail="User already exists.")
-    users_db[user.email] = {
-        "password": user.password,
-        "plan": "free",
-        "created_at": datetime.now(timezone.utc),
-    }
-    return {"status": "success", "message": "Signup successful."}
-
-
-@app.post("/api/login")
-def login(user: UserLogin):
-    saved = users_db.get(user.email)
-    if not saved or saved["password"] != user.password:
-        raise HTTPException(status_code=401, detail="Invalid email or password.")
-    return {
-        "status": "success",
-        "token": secrets.token_urlsafe(24),
-        "plan": saved["plan"],
-    }
-
+    return {"status":"ok","database":bool(db),"mail_domain":MAIL_DOMAIN}
 
 @app.post("/api/generate-email")
-def generate_email(email: Optional[str] = None, plan_type: str = "free"):
-    # Anonymous generation is allowed so the homepage works immediately.
-    owner = email if email in users_db else None
-    if owner and plan_type == "pro" and users_db[owner]["plan"] == "pro":
-        duration = timedelta(hours=12)
-        plan = "pro"
-    else:
-        duration = timedelta(hours=2)
-        plan = "free"
+def generate_email(payload:GenerateRequest,request:Request):
+    d=database(); user=current_user(request)
+    owner=str(user.id) if user else None
+    visitor=None if owner else payload.visitor_id
+    if not owner and not visitor: visitor=secrets.token_urlsafe(18)
 
-    now = datetime.now(timezone.utc)
-    random_id = uuid.uuid4().hex[:8]
-    temp_email = f"user_{random_id}@nextmail.site"
-    expires_at = now + duration
+    q=d.table("mailboxes").select("*").eq("active",True).gt("expires_at",now().isoformat())
+    q=q.eq("owner_id",owner) if owner else q.eq("visitor_id",visitor)
+    existing=q.limit(1).execute().data
+    if existing:
+        m=existing[0]
+        return {"temp_email":m["address"],"expires_at":m["expires_at"],"plan":m["plan"],"visitor_id":visitor}
 
-    emails_db[temp_email] = {
-        "owner": owner,
-        "plan": plan,
-        "created_at": now,
-        "expires_at": expires_at,
-        "messages": [],
-    }
+    plan="free"
+    if user:
+        p=ensure_profile(user)
+        if p.get("pro_expires_at"):
+            try:
+                if datetime.fromisoformat(p["pro_expires_at"].replace("Z","+00:00"))>now(): plan="pro"
+            except ValueError: pass
 
-    return {
-        "temp_email": temp_email,
-        "expires_at": expires_at.isoformat(),
-        "plan": plan,
-    }
+    expires=now()+timedelta(days=7 if plan=="pro" else 2/24)
+    for _ in range(5):
+        address="n"+secrets.token_hex(5)+"@"+MAIL_DOMAIN
+        try:
+            row=d.table("mailboxes").insert({"address":address,"owner_id":owner,"visitor_id":visitor,"plan":plan,"expires_at":expires.isoformat(),"active":True}).execute().data[0]
+            return {"temp_email":row["address"],"expires_at":row["expires_at"],"plan":plan,"visitor_id":visitor}
+        except Exception: continue
+    raise HTTPException(500,"Could not create mailbox.")
 
+@app.get("/api/inbox/{address}")
+def inbox(address:str):
+    d=database()
+    m=d.table("mailboxes").select("*").eq("address",address.lower()).maybe_single().execute().data
+    if not m: raise HTTPException(404,"Email does not exist.")
+    if datetime.fromisoformat(m["expires_at"].replace("Z","+00:00"))<=now():
+        d.table("mailboxes").update({"active":False}).eq("id",m["id"]).execute()
+        raise HTTPException(410,"Email has expired.")
+    msgs=d.table("messages").select("id,sender,recipient,subject,body_text,body_html,received_at").eq("mailbox_id",m["id"]).order("received_at",desc=True).execute().data
+    return {"temp_email":m["address"],"expires_at":m["expires_at"],"plan":m["plan"],"messages":msgs}
 
-@app.get("/api/inbox/{temp_email}")
-def get_inbox(temp_email: str):
-    mail_data = emails_db.get(temp_email)
-    if not mail_data:
-        raise HTTPException(status_code=404, detail="Email expired or does not exist.")
+@app.post("/api/mailgun/inbound")
+async def mailgun_inbound(request:Request):
+    d=database(); form=await request.form()
+    timestamp=str(form.get("timestamp","")); token=str(form.get("token","")); signature=str(form.get("signature",""))
+    expected=hmac.new(MAILGUN_SIGNING_KEY.encode(),(timestamp+token).encode(),hashlib.sha256).hexdigest()
+    if not MAILGUN_SIGNING_KEY or not hmac.compare_digest(expected,signature): raise HTTPException(401,"Invalid webhook signature.")
+    recipient=str(form.get("recipient","")).lower().strip()
+    match=re.search(r"<([^>]+)>",recipient); recipient=match.group(1) if match else recipient
+    m=d.table("mailboxes").select("*").eq("address",recipient).eq("active",True).maybe_single().execute().data
+    if not m: return {"status":"ignored"}
+    if datetime.fromisoformat(m["expires_at"].replace("Z","+00:00"))<=now():
+        d.table("mailboxes").update({"active":False}).eq("id",m["id"]).execute()
+        return {"status":"expired"}
+    d.table("messages").insert({"mailbox_id":m["id"],"sender":str(form.get("sender","")),"recipient":recipient,"subject":str(form.get("subject","")),"body_text":str(form.get("body-plain","")),"body_html":str(form.get("body-html",""))}).execute()
+    return {"status":"received"}
 
-    if datetime.now(timezone.utc) > mail_data["expires_at"]:
-        del emails_db[temp_email]
-        raise HTTPException(status_code=410, detail="Email has expired.")
-
-    return mail_data
-
-
-@app.post("/api/pay-pro")
-def process_payment(pay: PaymentRequest):
-    if pay.email not in users_db:
-        raise HTTPException(status_code=404, detail="User not found.")
-    # This endpoint only changes the demo plan state. Never send raw card
-    # details to this API; use a real payment provider for production.
-    users_db[pay.email]["plan"] = "pro"
-    return {"status": "success", "message": "Pro plan activated."}
-
+@app.get("/api/cleanup")
+def cleanup(x_cron_secret:Optional[str]=Header(default=None)):
+    if CRON_SECRET and not hmac.compare_digest(x_cron_secret or "",CRON_SECRET): raise HTTPException(401,"Unauthorized")
+    d=database()
+    r=d.table("mailboxes").update({"active":False}).lt("expires_at",now().isoformat()).eq("active",True).execute()
+    return {"status":"ok","expired":len(r.data or [])}
 
 @app.get("/")
-def home():
-    return FileResponse(BASE_DIR / "index.html")
-
-
-# Static pages/assets are mounted after API routes so /api/* is never shadowed.
-app.mount("/", StaticFiles(directory=BASE_DIR, html=True), name="frontend")
+def home(): return FileResponse(BASE_DIR/"index.html")
+app.mount("/",StaticFiles(directory=BASE_DIR,html=True),name="frontend")
