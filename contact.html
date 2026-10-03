@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextMail - Contact Us</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;">
+                <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                    <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 17.5L9.5 21L5 17L3.5 18.5" stroke="#00f2fe" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>NextMail</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <div class="lang-selector">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                English <span class="chevron">▾</span>
+            </div>
+            <a href="index.html" class="login-btn">Home</a>
+        </div>
+    </header>
+
+    <main class="pricing-container" style="max-width: 520px;">
+        <div class="pricing-header" style="margin-bottom: 30px;">
+            <div class="plan-pill">Get in Touch</div>
+            <h1>Contact <span class="highlight-cyan">Us</span></h1>
+            <p>Have questions or feedback? Send us a message.</p>
+        </div>
+
+        <div class="card" style="padding: 35px;">
+            <form onsubmit="event.preventDefault(); alert('Message sent successfully!');" style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Your Name</label>
+                    <div class="email-box" style="margin-bottom: 0;">
+                        <input type="text" placeholder="John Doe" required style="padding: 8px; margin-left: 10px;">
+                    </div>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Email Address</label>
+                    <div class="email-box" style="margin-bottom: 0;">
+                        <input type="email" placeholder="name@example.com" required style="padding: 8px; margin-left: 10px;">
+                    </div>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Message</label>
+                    <textarea placeholder="Write your message here..." required style="width: 100%; background: #04060a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px; color: #fff; outline: none; height: 120px; resize: none;"></textarea>
+                </div>
+                <button type="submit" class="plan-btn new-btn" style="width: 100%; justify-content: center;">Send Message →</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-links">
+            <a href="about.html">About Us</a>
+            <a href="contact.html">Contact</a>
+            <a href="terms.html">Terms</a>
+            <a href="privacy.html">Privacy Policy</a>
+        </div>
+        <p>© NextMail Inc. 2026</p>
+    </footer>
+</body>
+</html>
