@@ -9,23 +9,23 @@
 </head>
 <body>
     <header class="navbar">
-        <div class="logo">
-            <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M14 17.5L9.5 21L5 17L3.5 18.5" stroke="#00f2fe" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>NextMail</span>
-        </div>
-        
-        <div class="nav-right"><a href="inbox.html" class="inbox-nav-link" aria-label="Open inbox"><span class="inbox-nav-icon">✉</span><span>Inbox</span></a><a href="pricing.html" class="login-btn">Upgrade</a></div>
-
-            <a href="#inboxPanel" class="login-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                Inbox
-            </a>
-        </div>
-    </header>
+    <div class="logo">
+        <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 17.5L9.5 21L5 17L3.5 18.5" stroke="#00f2fe" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>NextMail</span>
+    </div>
+    <div class="nav-right">
+        <!-- Login ki jagah direct Inbox button jo neeche inbox panel par le jaye -->
+        <a href="#inboxPanel" class="inbox-nav-link" onclick="document.getElementById('inboxPanel').scrollIntoView({behavior:'smooth'}); loadInbox();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>Inbox</span>
+        </a>
+        <a href="pricing.html" class="login-btn">Upgrade</a>
+    </div>
+</header>
 
     <button id="inboxCorner" class="inbox-corner" onclick="document.getElementById('inboxPanel').scrollIntoView({behavior:'smooth',block:'start'});loadInbox()" aria-label="Open inbox">📥 <span>Inbox</span><b id="inboxCount">0</b></button>
 <main class="hero">
