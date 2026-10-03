@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "nextmail-backend/main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "nextmail-backend/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
