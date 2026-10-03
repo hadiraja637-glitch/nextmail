@@ -12,9 +12,6 @@
       "dest": "nextmail-backend/main.py"
     },
     {
-      "handle": "filesystem"
-    },
-    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
