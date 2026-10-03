@@ -1,10 +1,10 @@
-let currentVisitorId=localStorage.getItem("nextmail_visitor_id")||crypto.randomUUID();
-localStorage.setItem("nextmail_visitor_id",currentVisitorId);
+let currentVisitorId=localStorage.getItem("nextmail_visitor_token")||"";
 let currentEmail=null,expiresAt=null,timerInterval=null;
 
 async function api(path,options={}){
  const headers={...(options.headers||{}),"Content-Type":"application/json"};
  if(window.nextmailSupabase){const s=(await window.nextmailSupabase.auth.getSession()).data.session;if(s)headers.Authorization="Bearer "+s.access_token;}
+ if(currentVisitorId)headers["X-NextMail-Visitor"]=currentVisitorId;
  const r=await fetch("/api"+path,{...options,headers});const d=await r.json().catch(()=>({}));
  if(!r.ok)throw new Error(d.detail||"Request failed");return d;
 }
@@ -17,7 +17,7 @@ function renderTimer(){
 function startTimer(x){expiresAt=x;clearInterval(timerInterval);renderTimer();timerInterval=setInterval(renderTimer,1000);}
 async function generateEmail(){
  const b=document.querySelector(".new-btn");if(b)b.disabled=true;
- try{const d=await api("/generate-email",{method:"POST",body:JSON.stringify({visitor_id:currentVisitorId})});currentEmail=d.temp_email;document.getElementById("emailInput").value=currentEmail;startTimer(d.expires_at);loadInbox();}
+ try{const d=await api("/generate-email",{method:"POST",body:JSON.stringify({visitor_token:currentVisitorId})});currentEmail=d.temp_email;currentVisitorId=d.visitor_token||currentVisitorId;localStorage.setItem("nextmail_visitor_token",currentVisitorId);document.getElementById("emailInput").value=currentEmail;startTimer(d.expires_at);loadInbox();}
  catch(e){alert(e.message)}finally{if(b)b.disabled=false}
 }
 async function copyEmail(){
