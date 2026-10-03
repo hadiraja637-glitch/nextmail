@@ -45,7 +45,7 @@ def ensure_profile(user):
     return database().table("profiles").insert({"id":str(user.id),"email":user.email}).execute().data[0]
 
 class GenerateRequest(BaseModel):
-    visitor_id: Optional[str]=None
+    visitor_token: Optional[str]=None
 
 @app.get("/api/config")
 def config():
@@ -59,15 +59,17 @@ def health():
 def generate_email(payload:GenerateRequest,request:Request):
     d=database(); user=current_user(request)
     owner=str(user.id) if user else None
-    visitor=None if owner else payload.visitor_id
-    if not owner and not visitor: visitor=secrets.token_urlsafe(18)
+    visitor=None if owner else payload.visitor_token
+    if not owner and visitor and not re.fullmatch(r"[A-Za-z0-9_-]{32,128}", visitor):
+        raise HTTPException(400,"Invalid inbox session.")
+    if not owner and not visitor: visitor=secrets.token_urlsafe(48)
 
     q=d.table("mailboxes").select("*").eq("active",True).gt("expires_at",now().isoformat())
     q=q.eq("owner_id",owner) if owner else q.eq("visitor_id",visitor)
     existing=q.limit(1).execute().data
     if existing:
         m=existing[0]
-        return {"temp_email":m["address"],"expires_at":m["expires_at"],"plan":m["plan"],"visitor_id":visitor}
+        return {"temp_email":m["address"],"expires_at":m["expires_at"],"plan":m["plan"],"visitor_token":visitor}
 
     plan="free"
     if user:
@@ -82,15 +84,18 @@ def generate_email(payload:GenerateRequest,request:Request):
         address="n"+secrets.token_hex(5)+"@"+MAIL_DOMAIN
         try:
             row=d.table("mailboxes").insert({"address":address,"owner_id":owner,"visitor_id":visitor,"plan":plan,"expires_at":expires.isoformat(),"active":True}).execute().data[0]
-            return {"temp_email":row["address"],"expires_at":row["expires_at"],"plan":plan,"visitor_id":visitor}
+            return {"temp_email":row["address"],"expires_at":row["expires_at"],"plan":plan,"visitor_token":visitor}
         except Exception: continue
     raise HTTPException(500,"Could not create mailbox.")
 
 @app.get("/api/inbox/{address}")
-def inbox(address:str):
+def inbox(address:str, request:Request):
     d=database()
     m=d.table("mailboxes").select("*").eq("address",address.lower()).maybe_single().execute().data
     if not m: raise HTTPException(404,"Email does not exist.")
+    if m.get("owner_id") is None:
+        visitor=request.headers.get("x-nextmail-visitor","")
+        if not visitor or not hmac.compare_digest(visitor,m.get("visitor_id") or ""): raise HTTPException(403,"This inbox is not yours.")
     if datetime.fromisoformat(m["expires_at"].replace("Z","+00:00"))<=now():
         d.table("mailboxes").update({"active":False}).eq("id",m["id"]).execute()
         raise HTTPException(410,"Email has expired.")
