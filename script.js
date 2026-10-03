@@ -1,86 +1,22 @@
-let currentEmail = null, expiresAt = null, timerInterval = null;
-
-async function api(path, options = {}) {
-    const headers = { ...(options.headers || {}), "Content-Type": "application/json" };
-    const r = await fetch("/api" + path, { ...options, headers });
-    const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.detail || "Request failed");
-    return d;
-}
-
-function renderTimer() {
-    const el = document.getElementById("timer");
-    if (!el || !expiresAt) return;
-    const left = Math.max(0, new Date(expiresAt) - Date.now()), s = Math.floor(left / 1000);
-    el.textContent = String(Math.floor(s / 3600)).padStart(2, "0") + ":" + String(Math.floor(s % 3600 / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
-    if (left <= 0) {
-        clearInterval(timerInterval);
-        currentEmail = null;
-        const i = document.getElementById("emailInput");
-        if (i) i.value = "Expired — Generate New Email";
-    }
-}
-
-function startTimer(x) {
-    expiresAt = x;
-    clearInterval(timerInterval);
-    renderTimer();
-    timerInterval = setInterval(renderTimer, 1000);
-}
-
-async function generateEmail() {
-    const b = document.querySelector(".new-btn");
-    if (b) b.disabled = true;
-    try {
-        const d = await api("/generate", { method: "GET" });
-        currentEmail = d.email;
-        const emailInput = document.getElementById("emailInput");
-        if (emailInput) emailInput.value = currentEmail;
-        startTimer(new Date(Date.now() + 10 * 60 * 1000).toISOString());
-        loadInbox();
-    } catch (e) {
-        console.error(e);
-    } finally {
-        if (b) b.disabled = false;
-    }
-}
-
-async function copyEmail() {
-    if (!currentEmail) return;
-    await navigator.clipboard.writeText(currentEmail);
-    const b = document.querySelector(".copy-btn");
-    if (b) {
-        b.innerText = "Copied!";
-        setTimeout(() => b.innerText = "Copy", 1500);
-    }
-}
-
-async function loadInbox() {
-    if (!currentEmail) return;
-    try {
-        const d = await api("/inbox/" + encodeURIComponent(currentEmail));
-        renderInbox(d.messages || []);
-    } catch (e) {}
-}
-
-function renderInbox(messages) {
-    let box = document.getElementById("inbox");
-    if (!box) return;
-    box.innerHTML = messages.length ? messages.map(m => `
-        <div class="email-item" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 12px; margin-bottom: 10px; border-radius: 8px;">
-            <div style="color: #00f2fe; font-size: 13px; margin-bottom: 4px;"><b>From:</b> ${escapeHtml(m.sender)}</div>
-            <div style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 6px;"><b>Subject:</b> ${escapeHtml(m.subject)}</div>
-            <div style="color: #94a3b8; font-size: 13px;">${escapeHtml(m.body)}</div>
-        </div>
-    `).join("") : "<p style='color: #94a3b8; text-align: center; padding: 20px;'>No messages yet. Waiting for incoming emails...</p>";
-}
-
-function escapeHtml(v) {
-    return String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const b = document.querySelector(".new-btn");
-    if (b) b.addEventListener("click", generateEmail);
-    generateEmail();
-});
+const translations={
+en:{name:"English",hero:"Instant Temporary Email",sub:"Get a disposable email address in seconds. Keep your real inbox safe, private and spam-free.",inbox:"Inbox",instant:"Instant",temporary:"Temporary Email",copy:"Copy",copied:"Copied!",newEmail:"New Email",active:"Active for:",incoming:"Incoming Messages",refresh:"↻ Refresh",secure:"100% Secure & Private",secureDesc:"Emails are automatically deleted after 2 hours.",fast:"Ultra-Fast Delivery",fastDesc:"Receive emails in real-time, no delays.",spam:"Spam Protection",spamDesc:"Your real inbox stays clean from junk mail."},
+es:{name:"Español",hero:"Correo Temporal Instantáneo",sub:"Obtén una dirección de correo desechable en segundos. Mantén tu bandeja real segura y libre de spam.",inbox:"Bandeja",instant:"Instantáneo",temporary:"Correo Temporal",copy:"Copiar",copied:"¡Copiado!",newEmail:"Nuevo correo",active:"Activo durante:",incoming:"Mensajes entrantes",refresh:"↻ Actualizar",secure:"100% Seguro y Privado",secureDesc:"Los correos se eliminan automáticamente después de 2 horas.",fast:"Entrega ultrarrápida",fastDesc:"Recibe correos en tiempo real, sin retrasos.",spam:"Protección contra spam",spamDesc:"Tu bandeja real se mantiene limpia."},
+fr:{name:"Français",hero:"E-mail Temporaire Instantané",sub:"Obtenez une adresse e-mail jetable en quelques secondes.",inbox:"Boîte de réception",instant:"Instantané",temporary:"E-mail Temporaire",copy:"Copier",copied:"Copié !",newEmail:"Nouvel e-mail",active:"Actif pendant :",incoming:"Messages entrants",refresh:"↻ Actualiser",secure:"100% Sécurisé et Privé",secureDesc:"Les e-mails sont automatiquement supprimés après 2 heures.",fast:"Livraison ultra-rapide",fastDesc:"Recevez les e-mails en temps réel.",spam:"Protection anti-spam",spamDesc:"Votre vraie boîte reste propre."},
+de:{name:"Deutsch",hero:"Sofortige temporäre E-Mail",sub:"Erhalte in Sekunden eine Wegwerf-E-Mail-Adresse und halte deinen echten Posteingang privat.",inbox:"Posteingang",instant:"Sofort",temporary:"Temporäre E-Mail",copy:"Kopieren",copied:"Kopiert!",newEmail:"Neue E-Mail",active:"Aktiv für:",incoming:"Eingehende Nachrichten",refresh:"↻ Aktualisieren",secure:"100% Sicher und Privat",secureDesc:"E-Mails werden nach 2 Stunden automatisch gelöscht.",fast:"Blitzschnelle Zustellung",fastDesc:"E-Mails in Echtzeit empfangen.",spam:"Spam-Schutz",spamDesc:"Dein echter Posteingang bleibt frei von Spam."},
+ar:{name:"العربية",hero:"بريد إلكتروني مؤقت فوري",sub:"احصل على عنوان بريد إلكتروني مؤقت خلال ثوانٍ وحافظ على بريدك الحقيقي آمناً.",inbox:"الوارد",instant:"فوري",temporary:"بريد مؤقت",copy:"نسخ",copied:"تم النسخ!",newEmail:"بريد جديد",active:"نشط لمدة:",incoming:"الرسائل الواردة",refresh:"↻ تحديث",secure:"آمن وخاص 100%",secureDesc:"يتم حذف رسائل البريد تلقائياً بعد ساعتين.",fast:"تسليم فائق السرعة",fastDesc:"استقبل الرسائل في الوقت الفعلي.",spam:"حماية من البريد المزعج",spamDesc:"يبقى بريدك الحقيقي نظيفاً."},
+zh:{name:"中文",hero:"即时临时电子邮件",sub:"几秒钟获取一次性邮箱地址，保护你的真实邮箱安全并远离垃圾邮件。",inbox:"收件箱",instant:"即时",temporary:"临时邮箱",copy:"复制",copied:"已复制！",newEmail:"新邮箱",active:"有效时间：",incoming:"收到的邮件",refresh:"↻ 刷新",secure:"100% 安全与隐私",secureDesc:"邮件会在2小时后自动删除。",fast:"极速投递",fastDesc:"实时接收邮件，无延迟。",spam:"垃圾邮件防护",spamDesc:"让你的真实邮箱远离垃圾邮件。"}};
+let currentEmail=localStorage.getItem("nextmail_active_email")||null;
+let visitorToken=localStorage.getItem("nextmail_visitor_token")||"";
+let expiresAt=null,timerInterval=null,currentLang=localStorage.getItem("nextmail_lang")||"en";
+async function api(path,options={}){const headers={...(options.headers||{}),"Content-Type":"application/json"};if(visitorToken)headers["X-NextMail-Visitor"]=visitorToken;const r=await fetch("/api"+path,{...options,headers});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.detail||"Request failed");return d}
+function startTimer(x){expiresAt=x;clearInterval(timerInterval);renderTimer();timerInterval=setInterval(renderTimer,1000)}
+function renderTimer(){const e=document.getElementById("timer");if(!e||!expiresAt)return;const left=Math.max(0,new Date(expiresAt)-Date.now()),s=Math.floor(left/1000);e.textContent=String(Math.floor(s/3600)).padStart(2,"0")+":"+String(Math.floor(s%3600/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");if(left===0){clearInterval(timerInterval);currentEmail=null;localStorage.removeItem("nextmail_active_email")}}
+async function generateEmail(){const b=document.querySelector(".new-btn");if(b)b.disabled=true;try{const d=await api("/generate-email",{method:"POST",body:JSON.stringify({visitor_token:visitorToken||null})});currentEmail=d.temp_email;visitorToken=d.visitor_token||visitorToken;localStorage.setItem("nextmail_active_email",currentEmail);localStorage.setItem("nextmail_visitor_token",visitorToken);const i=document.getElementById("emailInput");if(i)i.value=currentEmail;startTimer(d.expires_at);loadInbox()}catch(e){console.error(e);const i=document.getElementById("emailInput");if(i)i.value="Unable to create email"}finally{if(b)b.disabled=false}}
+async function copyEmail(){if(!currentEmail)return;await navigator.clipboard.writeText(currentEmail);const b=document.querySelector(".copy-btn");if(b){b.innerText=translations[currentLang].copied;setTimeout(()=>b.innerText=translations[currentLang].copy,1200)}}
+async function loadInbox(){if(!currentEmail)return;try{const d=await api("/inbox/"+encodeURIComponent(currentEmail));if(d.expires_at)startTimer(d.expires_at);renderInbox(d.messages||[])}catch(e){console.error(e)}}
+function renderInbox(ms){const box=document.getElementById("inbox");if(!box)return;box.innerHTML=ms.length?ms.map(m=>'<article class="inbox-message"><strong>'+escapeHtml(m.subject||"(No subject)")+'</strong><small>'+escapeHtml(m.sender||"Unknown sender")+'</small><p>'+escapeHtml(m.body_text||m.body||"")+'</p></article>').join(""):'<div class="inbox-empty">No messages yet. Incoming mail will appear here automatically.</div>'}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toggleLanguages(e){e.stopPropagation();document.getElementById("languageMenu")?.classList.toggle("open")}
+function setLanguage(lang){currentLang=lang;localStorage.setItem("nextmail_lang",lang);const t=translations[lang]||translations.en;const c=document.getElementById("currentLang");if(c)c.textContent=t.name+" ▾";document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(t[k])el.textContent=t[k]});const h=document.querySelector(".hero-card h1"),sub=document.querySelector(".hero-sub"),badge=document.querySelector(".badge-text-green"),label=document.getElementById("timerLabel"),title=document.querySelector(".inbox-header h2"),refresh=document.querySelector(".refresh-inbox-btn");if(h)h.textContent=t.hero;if(sub)sub.textContent=t.sub;if(badge)badge.textContent=t.instant;if(label)label.textContent=t.active;if(title)title.textContent=t.incoming;if(refresh)refresh.textContent=t.refresh}
+function togglePricingLanguages(e){e.stopPropagation();document.getElementById("pricingLanguageMenu")?.classList.toggle("open")}
+document.addEventListener("DOMContentLoaded",()=>{setLanguage(currentLang);const b=document.querySelector(".new-btn");if(b)b.addEventListener("click",generateEmail);if(currentEmail){const i=document.getElementById("emailInput");if(i)i.value=currentEmail;loadInbox()}else generateEmail();document.addEventListener("click",()=>{document.querySelectorAll(".language-menu").forEach(m=>m.classList.remove("open"))})});
