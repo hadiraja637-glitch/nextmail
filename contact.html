@@ -34,25 +34,32 @@
         </div>
 
         <div class="card" style="padding: 35px;">
-            <form onsubmit="event.preventDefault(); alert('Message sent successfully!');" style="display: flex; flex-direction: column; gap: 20px;">
+            <form id="contactForm" style="display: flex; flex-direction: column; gap: 20px;">
                 <div>
                     <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Your Name</label>
                     <div class="email-box" style="margin-bottom: 0;">
-                        <input type="text" placeholder="John Doe" required style="padding: 8px; margin-left: 10px;">
+                        <input id="contactName" type="text" placeholder="John Doe" required style="padding: 8px; margin-left: 10px;">
                     </div>
                 </div>
                 <div>
                     <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Email Address</label>
                     <div class="email-box" style="margin-bottom: 0;">
-                        <input type="email" placeholder="name@example.com" required style="padding: 8px; margin-left: 10px;">
+                        <input id="contactEmail" type="email" placeholder="name@example.com" required style="padding: 8px; margin-left: 10px;">
                     </div>
                 </div>
                 <div>
                     <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Message</label>
-                    <textarea placeholder="Write your message here..." required style="width: 100%; background: #04060a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px; color: #fff; outline: none; height: 120px; resize: none;"></textarea>
+                    <textarea id="contactMessage" placeholder="Write your message here..." required style="width: 100%; background: #04060a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px; color: #fff; outline: none; height: 120px; resize: none;"></textarea>
                 </div>
                 <button type="submit" class="plan-btn new-btn" style="width: 100%; justify-content: center;">Send Message →</button>
-            </form>
+            <div id="contactStatus" style="font-size:13px;color:#94a3b8;text-align:center;min-height:18px;"></div></form>
+<script>
+document.getElementById("contactForm").addEventListener("submit",async function(e){
+ e.preventDefault(); const btn=this.querySelector("button"), status=document.getElementById("contactStatus");
+ btn.disabled=true; status.textContent="Sending...";
+ try{const r=await fetch("/api/contact",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:document.getElementById("contactName").value,email:document.getElementById("contactEmail").value,message:document.getElementById("contactMessage").value})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.detail||"Unable to send message.");status.textContent="Message sent successfully.";this.reset();}catch(err){status.textContent=err.message}finally{btn.disabled=false}
+});
+</script>
         </div>
     </main>
 
