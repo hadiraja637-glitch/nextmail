@@ -3,72 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextMail - Login</title>
+    <title>Login - NextMail</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <header class="navbar">
-        <div class="logo">
-            <a href="index.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;">
-                <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
-                    <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M14 17.5L9.5 21L5 17L3.5 18.5" stroke="#00f2fe" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <span>NextMail</span>
-            </a>
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 17.5L9.5 21L5 17L3.5 18.5" stroke="#00f2fe" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>NextMail</span>
         </div>
         <div class="nav-right">
-            <div class="lang-selector">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                English <span class="chevron">▾</span>
-            </div>
-            <a href="index.html" class="login-btn">Home</a>
+            <a href="index.html" class="login-btn">Back to Home</a>
         </div>
     </header>
 
-    <main class="pricing-container" style="max-width: 480px;">
-        <div class="pricing-header" style="margin-bottom: 30px;">
-            <div class="plan-pill">Welcome Back</div>
-            <h1>Sign in to <span class="highlight-cyan">NextMail</span></h1>
-            <p>Access your Pro features, custom domains, and saved emails.</p>
-        </div>
+    <main class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px;">
+        <div class="auth-card" style="background: linear-gradient(135deg, rgba(13, 20, 33, 0.85), rgba(7, 11, 18, 0.95)); border: 1px solid rgba(0, 242, 254, 0.2); box-shadow: 0 0 40px rgba(0, 242, 254, 0.06); border-radius: 24px; padding: 40px; width: 100%; max-width: 420px;">
+            
+            <h2 style="text-align: center; font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 8px;">Welcome Back</h2>
+            <p style="text-align: center; color: #94a3b8; font-size: 14px; margin-bottom: 30px;">Sign in to access your NextMail dashboard</p>
 
-        <div class="card" style="padding: 35px;">
-            <form onsubmit="event.preventDefault();" style="display: flex; flex-direction: column; gap: 20px;">
-                <div>
-                    <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Email Address</label>
-                    <div class="email-box" style="margin-bottom: 0;">
-                        <span class="email-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                        </span>
-                        <input type="email" placeholder="name@example.com" required style="padding: 8px;">
-                    </div>
+            <!-- Google Sign-In Button -->
+            <button class="google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); padding: 12px; border-radius: 12px; color: #fff; font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.3s; margin-bottom: 20px;">
+                <svg width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.16 21.32 7.22 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.18C.43 8.13 0 9.83 0 11.6s.43 3.47 1.18 4.99l4.09-2.35z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.76 0 3.34.61 4.58 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.16 2.68 1.18 6.61l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div style="display: flex; align-items: center; text-align: center; color: #64748b; margin: 20px 0; font-size: 13px;">
+                <div style="flex: 1; border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
+                <span style="padding: 0 10px;">OR</span>
+                <div style="flex: 1; border-bottom: 1px solid rgba(255, 255, 255, 0.1);"></div>
+            </div>
+
+            <!-- Email / Password Form -->
+            <form onsubmit="event.preventDefault(); alert('Login feature is simulated successfully!');">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Email Address</label>
+                    <input type="email" placeholder="name@example.com" required style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 14px; outline: none;">
                 </div>
 
-                <div>
-                    <label style="display: block; font-size: 13px; color: #94a3b8; margin-bottom: 8px; font-weight: 500;">Password</label>
-                    <div class="email-box" style="margin-bottom: 0;">
-                        <span class="email-icon">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </span>
-                        <input type="password" placeholder="••••••••" required style="padding: 8px;">
-                    </div>
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Password</label>
+                    <input type="password" placeholder="••••••••" required style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 14px; outline: none;">
                 </div>
 
-                <button type="submit" class="plan-btn new-btn" style="width: 100%; margin-top: 10px; justify-content: center; font-size: 15px;">Sign In →</button>
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #00f2fe, #3b82f6); color: #04060a; font-weight: 600; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 15px; transition: 0.3s;">
+                    Sign In
+                </button>
             </form>
+
+            <p style="text-align: center; margin-top: 20px; font-size: 13px; color: #94a3b8;">
+                Don't have an account? <a href="pricing.html" style="color: #00f2fe; text-decoration: none;">Explore Plans</a>
+            </p>
         </div>
     </main>
 
-    <footer>
-        <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-            <a href="#">Terms</a>
-            <a href="#">Privacy Policy</a>
-        </div>
+    <footer style="text-align: center; padding: 20px; color: #64748b; font-size: 13px;">
         <p>© NextMail Inc. 2026</p>
     </footer>
 </body>
