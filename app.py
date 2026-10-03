@@ -119,8 +119,8 @@ async def mailgun_inbound(request:Request):
     return {"status":"received"}
 
 @app.get("/api/cleanup")
-def cleanup(x_cron_secret:Optional[str]=Header(default=None)):
-    if CRON_SECRET and not hmac.compare_digest(x_cron_secret or "",CRON_SECRET): raise HTTPException(401,"Unauthorized")
+def cleanup(authorization:Optional[str]=Header(default=None)):
+    if CRON_SECRET and not authorization == "Bearer "+CRON_SECRET: raise HTTPException(401,"Unauthorized")
     d=database()
     r=d.table("mailboxes").update({"active":False}).lt("expires_at",now().isoformat()).eq("active",True).execute()
     return {"status":"ok","expired":len(r.data or [])}
