@@ -48,7 +48,7 @@
                 <span class="email-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 </span>
-                <input type="text" id="emailInput" value="nexus74@nextmail.io" readonly>
+                <input type="text" id="emailInput" value="" placeholder="Click “New Email” to generate your temporary address" readonly>
                 <button class="copy-btn" onclick="copyEmail()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     Copy
@@ -70,7 +70,7 @@
                     <span class="inbox-kicker">LIVE INBOX</span>
                     <h2>Incoming Messages</h2>
                 </div>
-                <button class="refresh-inbox-btn" onclick="loadInbox()">↻ Refresh</button>
+                <button class="refresh-inbox-btn" id="refreshInboxBtn" onclick="refreshInbox()">↻ Refresh</button>
             </div>
             <div id="inbox" class="inbox-list" aria-live="polite">
                 <div class="inbox-empty">Generate an email to activate your temporary inbox.</div>
