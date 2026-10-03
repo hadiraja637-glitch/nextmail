@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Inbox — NextMail</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="navbar">
+  <div class="logo" onclick="location.href='index.html'" style="cursor:pointer"><span>NextMail</span></div>
+  <div class="nav-right"><a href="pricing.html" class="login-btn">Upgrade</a></div>
+</header>
+<main class="inbox-page">
+  <section class="inbox-page-card">
+    <div class="inbox-page-top">
+      <div><span class="inbox-kicker">NEXTMAIL INBOX</span><h1>Your Temporary Inbox</h1><p>Messages received by your active temporary email appear here.</p></div>
+      <button class="refresh-inbox-btn" onclick="loadInbox()">↻ Refresh</button>
+    </div>
+    <div class="current-mail"><span>Active email</span><strong id="activeEmail">No active email</strong><button onclick="copyEmail()">Copy</button></div>
+    <div class="timer-row"><span>Time remaining</span><strong id="timer">--:--:--</strong></div>
+    <div id="inbox" class="inbox-list" aria-live="polite"><div class="inbox-empty">Generate an email on the home page to activate your inbox.</div></div>
+    <a href="index.html" class="back-home">← Generate a new email</a>
+  </section>
+</main>
+<script>
+let currentEmail=localStorage.getItem("nextmail_active_email")||"";
+let visitorToken=localStorage.getItem("nextmail_visitor_token")||"";
+let expiresAt=null,timerInterval=null;
+function headers(){const h={"Content-Type":"application/json"};if(visitorToken)h["X-NextMail-Visitor"]=visitorToken;return h}
+function escapeHtml(v){return String(v||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function startTimer(x){expiresAt=x;clearInterval(timerInterval);renderTimer();timerInterval=setInterval(renderTimer,1000)}
+function renderTimer(){const el=document.getElementById("timer");if(!el||!expiresAt)return;const left=Math.max(0,new Date(expiresAt)-Date.now()),s=Math.floor(left/1000);el.textContent=String(Math.floor(s/3600)).padStart(2,"0")+":"+String(Math.floor(s%3600/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");if(!left){clearInterval(timerInterval);loadInbox()}}
+async function loadInbox(){
+ if(!currentEmail||!visitorToken)return;
+ try{const r=await fetch("/api/inbox/"+encodeURIComponent(currentEmail),{headers:headers()});const d=await r.json();if(!r.ok)throw new Error(d.detail||"Inbox unavailable");document.getElementById("activeEmail").textContent=d.temp_email;startTimer(d.expires_at);renderInbox(d.messages||[])}
+ catch(e){document.getElementById("inbox").innerHTML='<div class="inbox-empty">'+escapeHtml(e.message)+'</div>'}
+}
+function renderInbox(ms){const box=document.getElementById("inbox");box.innerHTML=ms.length?ms.map(m=>'<article class="inbox-message"><strong>'+escapeHtml(m.subject||"(No subject)")+'</strong><small>'+escapeHtml(m.sender||"Unknown sender")+'</small><p>'+escapeHtml(m.body_text||"")+'</p><time>'+escapeHtml(m.received_at||"")+'</time></article>').join(""):'<div class="inbox-empty">No messages yet. Incoming mail will appear here automatically.</div>'}
+async function copyEmail(){if(!currentEmail)return;await navigator.clipboard.writeText(currentEmail)}
+document.getElementById("activeEmail").textContent=currentEmail||"No active email";loadInbox();
+</script>
+</body></html>
