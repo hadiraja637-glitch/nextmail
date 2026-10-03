@@ -18,16 +18,23 @@
         <span>NextMail</span>
     </div>
     <div class="nav-right">
-        <!-- Login ki jagah direct Inbox button jo neeche inbox panel par le jaye -->
-        <a href="#inboxPanel" class="inbox-nav-link" onclick="document.getElementById('inboxPanel').scrollIntoView({behavior:'smooth'}); loadInbox();">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span>Inbox</span>
-        </a>
-        <a href="pricing.html" class="login-btn">Upgrade</a>
+        <div class="lang-selector" id="langSelector">
+            <span>◎</span>
+            <button class="lang-current" id="currentLang" onclick="toggleLanguages(event)">English ▾</button>
+            <div class="language-menu" id="languageMenu">
+                <button onclick="setLanguage('en')">English</button>
+                <button onclick="setLanguage('es')">Español</button>
+                <button onclick="setLanguage('fr')">Français</button>
+                <button onclick="setLanguage('de')">Deutsch</button>
+                <button onclick="setLanguage('ar')">العربية</button>
+                <button onclick="setLanguage('zh')">中文</button>
+            </div>
+        </div>
+        <a href="inbox.html" class="inbox-nav-link"><span class="inbox-nav-icon">✉</span><span data-i18n="inbox">Inbox</span></a>
     </div>
 </header>
 
-    <button id="inboxCorner" class="inbox-corner" onclick="document.getElementById('inboxPanel').scrollIntoView({behavior:'smooth',block:'start'});loadInbox()" aria-label="Open inbox">📥 <span>Inbox</span><b id="inboxCount">0</b></button>
+
 <main class="hero">
         <div class="hero-card">
             <div class="hero-top-badge">
