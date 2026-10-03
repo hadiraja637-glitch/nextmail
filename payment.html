@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - NextMail Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M14 17.5L9.5 21L5 17L3.5 18.5" stroke="#00f2fe" stroke-width="2" stroke-opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>NextMail</span>
+        </div>
+        <div class="nav-right">
+            <a href="pricing.html" class="login-btn">Back to Pricing</a>
+        </div>
+    </header>
+
+    <main class="auth-container" style="display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 20px;">
+        <div class="auth-card" style="background: linear-gradient(135deg, rgba(13, 20, 33, 0.85), rgba(7, 11, 18, 0.95)); border: 1px solid rgba(245, 175, 25, 0.3); box-shadow: 0 0 40px rgba(245, 175, 25, 0.08); border-radius: 24px; padding: 40px; width: 100%; max-width: 440px;">
+            
+            <div style="text-align: center; margin-bottom: 25px;">
+                <span style="background: rgba(245, 175, 25, 0.1); color: #f5af19; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid rgba(245, 175, 25, 0.2);">PRO PLAN CHECKOUT</span>
+                <h2 style="font-size: 24px; font-weight: 700; color: #fff; margin-top: 15px; margin-bottom: 5px;">Upgrade to Pro</h2>
+                <p style="color: #94a3b8; font-size: 14px;">Total to pay: <strong style="color: #f5af19; font-size: 18px;">$2</strong> / week</p>
+            </div>
+
+            <!-- Payment Form -->
+            <form onsubmit="event.preventDefault(); alert('Payment integration successful! Welcome to NextMail Pro.'); window.location.href='index.html';">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Cardholder Name</label>
+                    <input type="text" placeholder="John Doe" required style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 14px; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Card Number</label>
+                    <input type="text" placeholder="4242 •••• •••• ••••" maxlength="19" required style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 14px; outline: none;">
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">Expiry Date</label>
+                        <input type="text" placeholder="MM/YY" maxlength="5" required style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 14px; outline: none;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px;">CVV</label>
+                        <input type="password" placeholder="123" maxlength="4" required style="width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; border-radius: 10px; color: #fff; font-size: 14px; outline: none;">
+                    </div>
+                </div>
+
+                <button type="submit" style="width: 100%; background: linear-gradient(135deg, #f5af19, #f2709c); color: #04060a; font-weight: 600; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 15px; transition: 0.3s;">
+                    Pay $2 & Unlock Pro
+                </button>
+            </form>
+
+            <p style="text-align: center; margin-top: 20px; font-size: 12px; color: #64748b;">
+                🔒 Secure 256-bit encrypted checkout simulation
+            </p>
+        </div>
+    </main>
+
+    <footer style="text-align: center; padding: 20px; color: #64748b; font-size: 13px;">
+        <p>© NextMail Inc. 2026</p>
+    </footer>
+</body>
+</html>
