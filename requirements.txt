@@ -2,3 +2,5 @@ fastapi
 uvicorn
 pydantic
 requests
+supabase
+python-multipart
