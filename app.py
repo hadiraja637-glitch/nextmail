@@ -127,4 +127,5 @@ def cleanup(authorization:Optional[str]=Header(default=None)):
 
 @app.get("/")
 def home(): return FileResponse(BASE_DIR/"index.html")
+
 app.mount("/",StaticFiles(directory=BASE_DIR,html=True),name="frontend")
