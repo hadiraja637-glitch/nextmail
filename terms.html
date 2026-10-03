@@ -10,7 +10,7 @@
 <body>
     <header class="navbar">
         <div class="logo">
-            <a href="index.html" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;">
+            <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
                 <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none">
                     <path d="M3.5 13.5L8 10L12.5 14L20.5 7" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M16 7H20.5V11.5" stroke="#00f2fe" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -20,39 +20,34 @@
             </a>
         </div>
         <div class="nav-right">
-            <a href="index.html" class="back-home-link" aria-label="Back to Home">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+            <a href="index.html" class="back-home-link" aria-label="Back to Home" style="display: flex; align-items: center; gap: 6px; color: #94a3b8; text-decoration: none; font-size: 14px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5"/>
+                    <path d="M12 19l-7-7 7-7"/>
+                </svg>
                 <span>Back</span>
             </a>
         </div>
+    </header>
 
-    <main class="pricing-container" style="max-width: 700px;">
-        <div class="pricing-header" style="margin-bottom: 30px;">
-            <div class="plan-pill">Rules & Guidelines</div>
-            <h1>Terms of <span class="highlight-cyan">Service</span></h1>
-            <p>Please read these terms carefully before using NextMail.</p>
+    <main class="pricing-container" style="max-width: 700px; margin: 50px auto; padding: 0 20px;">
+        <div class="pricing-header" style="margin-bottom: 30px; text-align: center;">
+            <div class="plan-pill" style="display: inline-block; padding: 6px 14px; background: rgba(0, 242, 254, 0.1); color: #00f2fe; border-radius: 20px; font-size: 13px; font-weight: 500; margin-bottom: 15px;">Rules & Guidelines</div>
+            <h1 style="color: #fff; font-size: 32px; font-weight: 700;">Terms of <span class="highlight-cyan" style="color: #00f2fe;">Service</span></h1>
+            <p style="color: #94a3b8; font-size: 14px; margin-top: 8px;">Please read these terms carefully before using NextMail.</p>
         </div>
 
-        <div class="card" style="padding: 35px; text-align: left; line-height: 1.6; color: #94a3b8;">
-            <h3 style="color: #fff; margin-bottom: 10px; font-size: 16px;">1. Acceptable Use</h3>
-            <p style="margin-bottom: 20px;">NextMail must not be used for illegal activities, spamming, sending malicious software, or fraudulent sign-ups.</p>
-            
-            <h3 style="color: #fff; margin-bottom: 10px; font-size: 16px;">2. Service Availability</h3>
-            <p style="margin-bottom: 20px;">We provide the service on an "as is" basis without warranties of permanent availability.</p>
-
-            <h3 style="color: #fff; margin-bottom: 10px; font-size: 16px;">3. Modifications</h3>
-            <p>We reserve the right to modify these terms at any time.</p>
+        <div class="card" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); padding: 35px; border-radius: 16px; text-align: left; line-height: 1.6; color: #94a3b8;">
+            <p style="margin-bottom: 15px;">
+                By accessing and using NextMail, you agree to comply with and be bound by these terms. Our temporary email service is provided for legitimate testing, privacy protection, and verification purposes.
+            </p>
+            <p style="margin-bottom: 15px;">
+                Users are strictly prohibited from utilizing NextMail for illegal activities, spamming, phishing, or malicious operations. Any misuse of the service may result in restricted access.
+            </p>
+            <p>
+                We do not guarantee permanent storage of messages, as all emails and inboxes expire automatically to maintain user privacy and system efficiency.
+            </p>
         </div>
     </main>
-
-    <footer>
-        <div class="footer-links">
-            <a href="about.html">About Us</a>
-            <a href="contact.html">Contact</a>
-            <a href="terms.html">Terms</a>
-            <a href="privacy.html">Privacy Policy</a>
-        </div>
-        <p>© NextMail Inc. 2026</p>
-    </footer>
 </body>
 </html>
