@@ -1,4 +1,4 @@
-import os, secrets, hmac, hashlib, re
+import os, secrets, hmac, hashlib, re, json, urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
@@ -117,6 +117,33 @@ async def mailgun_inbound(request:Request):
         return {"status":"expired"}
     d.table("messages").insert({"mailbox_id":m["id"],"sender":str(form.get("sender","")),"recipient":recipient,"subject":str(form.get("subject","")),"body_text":str(form.get("body-plain","")),"body_html":str(form.get("body-html",""))}).execute()
     return {"status":"received"}
+
+
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    message: str
+
+@app.post("/api/contact")
+def contact(payload:ContactRequest):
+    name=payload.name.strip()[:120]
+    email=payload.email.strip()[:254]
+    message=payload.message.strip()[:5000]
+    if not name or not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+",email) or not message:
+        raise HTTPException(400,"Please provide a valid name, email, and message.")
+    api_key=os.getenv("RESEND_API_KEY","")
+    to_email=os.getenv("CONTACT_TO_EMAIL","ranimomna126@gmail.com")
+    from_email=os.getenv("CONTACT_FROM_EMAIL","")
+    if not api_key or not from_email:
+        raise HTTPException(503,"Contact email service is not configured yet.")
+    body={"from":from_email,"to":[to_email],"reply_to":email,"subject":"NextMail Contact: "+name,"text":f"Name: {name}\nEmail: {email}\n\n{message}"}
+    req=urllib.request.Request("https://api.resend.com/emails",data=json.dumps(body).encode(),headers={"Authorization":"Bearer "+api_key,"Content-Type":"application/json"},method="POST")
+    try:
+        with urllib.request.urlopen(req,timeout=10) as response:
+            if response.status not in (200,201): raise RuntimeError()
+    except Exception:
+        raise HTTPException(502,"Could not send your message right now.")
+    return {"status":"sent"}
 
 @app.get("/api/cleanup")
 def cleanup(authorization:Optional[str]=Header(default=None)):
