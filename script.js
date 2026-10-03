@@ -17,7 +17,7 @@ function renderTimer(){
 function startTimer(x){expiresAt=x;clearInterval(timerInterval);renderTimer();timerInterval=setInterval(renderTimer,1000);}
 async function generateEmail(){
  const b=document.querySelector(".new-btn");if(b)b.disabled=true;
- try{const d=await api("/generate-email",{method:"POST",body:JSON.stringify({visitor_token:currentVisitorId})});currentEmail=d.temp_email;currentVisitorId=d.visitor_token||currentVisitorId;localStorage.setItem("nextmail_visitor_token",currentVisitorId);document.getElementById("emailInput").value=currentEmail;startTimer(d.expires_at);loadInbox();}
+ try{const d=await api("/generate-email",{method:"POST",body:JSON.stringify({visitor_token:currentVisitorId})});currentEmail=d.temp_email;currentVisitorId=d.visitor_token||currentVisitorId;localStorage.setItem("nextmail_visitor_token",currentVisitorId);localStorage.setItem("nextmail_active_email",currentEmail);document.getElementById("emailInput").value=currentEmail;startTimer(d.expires_at);loadInbox();}
  catch(e){alert(e.message)}finally{if(b)b.disabled=false}
 }
 async function copyEmail(){
